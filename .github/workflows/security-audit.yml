@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  audit:
+  consensus:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -14,9 +14,13 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
         with:
           go-version: '1.25'
-      - name: Run targeted tests
+      - name: Blockchain tests
+        run: go test ./internal/blockchain/...
+      - name: Stake module tests
+        working-directory: blockchain/stake
+        run: go test ./...
+      - name: Wire tests and fuzzing
+        working-directory: wire
         run: |
-          go test ./internal/blockchain/... ./blockchain/stake/...
-      - name: Run short fuzzers
-        run: |
-          go test ./internal/blockchain/... -run '^$' -fuzz=Fuzz -fuzztime=20s
+          go test ./...
+          go test -run '^$' -fuzz '^Fuzz' -fuzztime 45s
