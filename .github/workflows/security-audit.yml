@@ -1,0 +1,30 @@
+name: Security Audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [audit-lab]
+permissions:
+  contents: read
+jobs:
+  consensus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.25'
+      - name: Blockchain tests
+        run: go test ./internal/blockchain/...
+      - name: Stake module tests
+        working-directory: blockchain/stake
+        run: go test ./...
+      - name: Wire tests
+        working-directory: wire
+        run: go test ./...
+      - name: Fuzz MsgTx decode
+        working-directory: wire
+        run: go test -run '^$' -fuzz '^FuzzAuditMsgTxDecode$' -fuzztime 30s
+      - name: Fuzz MsgBlock decode
+        working-directory: wire
+        run: go test -run '^$' -fuzz '^FuzzAuditMsgBlockDecode$' -fuzztime 30s
