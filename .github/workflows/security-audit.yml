@@ -19,10 +19,12 @@ jobs:
       - name: Stake module tests
         working-directory: blockchain/stake
         run: go test ./...
-      - name: Wire tests and fuzzing
+      - name: Wire tests
         working-directory: wire
-        run: |
-          go test ./...
-          go test -run '^$' -fuzz '^Fuzz' -fuzztime 45s
-      - name: Record audit marker
-        run: echo "dcrd security audit run"
+        run: go test ./...
+      - name: Fuzz MsgTx decode
+        working-directory: wire
+        run: go test -run '^$' -fuzz '^FuzzAuditMsgTxDecode$' -fuzztime 30s
+      - name: Fuzz MsgBlock decode
+        working-directory: wire
+        run: go test -run '^$' -fuzz '^FuzzAuditMsgBlockDecode$' -fuzztime 30s
