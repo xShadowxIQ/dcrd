@@ -24,3 +24,5 @@ jobs:
         run: |
           go test ./...
           go test -run '^$' -fuzz '^Fuzz' -fuzztime 45s
+      - name: Record audit marker
+        run: echo "dcrd security audit run"
