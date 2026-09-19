@@ -1,1 +1,22 @@
-name: Security Audit\non:\n  workflow_dispatch:\n  push:\n    branches: [audit-lab]\npermissions:\n  contents: read\njobs:\n  audit:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - uses: actions/checkout@v7\n      - uses: actions/setup-go@v7\n        with:\n          go-version: '1.25'\n      - name: Run targeted tests\n        run: |\n          go test ./internal/blockchain/... ./blockchain/stake/...\n      - name: Run short fuzzers\n        run: |\n          go test ./internal/blockchain/... -run '^$' -fuzz=Fuzz -fuzztime=20s\n
+name: Security Audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [audit-lab]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.25'
+      - name: Run targeted tests
+        run: |
+          go test ./internal/blockchain/... ./blockchain/stake/...
+      - name: Run short fuzzers
+        run: |
+          go test ./internal/blockchain/... -run '^$' -fuzz=Fuzz -fuzztime=20s
